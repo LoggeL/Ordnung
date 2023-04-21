@@ -7,6 +7,7 @@
     <meta name="google" content="notranslate">
     <title>Ordnung</title>
     <link href="https://cdn.jsdelivr.net/npm/beercss@3.1.3/dist/cdn/beer.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
     <link href="main.css" rel="stylesheet">
 </head>
 
@@ -22,6 +23,14 @@
         </header>
     </div>
 
+    <div class="modal bottom" id="location-modal">
+        <h5>Ort Modal</h5>
+        <table class="border"></table>
+        <nav class="right-align">
+            <button class="border">Close</button>
+        </nav>
+    </div>
+
     <main class="responsive max">
         <div class="row">
             <button class="medium border" onclick="document.getElementById('collections').classList.add('active');">
@@ -34,7 +43,7 @@
     </main>
 
     <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.1.3/dist/cdn/beer.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
     <script src="pocketbase.umd.js"></script>
     <script src="main.js"></script>
 </body>
