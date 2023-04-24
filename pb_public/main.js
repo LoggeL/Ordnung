@@ -78,6 +78,71 @@ class BtnCellRenderer {
   render(props) {}
 }
 
+class TreeNode {
+  constructor(name, key) {
+    this.name = name
+    this.children = []
+    this.key = key
+  }
+}
+
+function buildTree(objs) {
+  const root = new TreeNode('root')
+
+  for (const key of objs) {
+    const parts = key.name.split('_')
+    let currentNode = root
+
+    for (const part of parts) {
+      let childNode = currentNode.children.find((child) => child.name === part)
+
+      if (!childNode) {
+        childNode = new TreeNode(part, key.name)
+        currentNode.children.push(childNode)
+      }
+
+      currentNode = childNode
+    }
+  }
+
+  return root
+}
+// for (const node of tree.children) {
+//   const row = document.createElement('a')
+//   row.classList.add('row', 'round')
+//   row.innerHTML = `
+//     <i>inbox</i>
+//     <span>${node.name}</span>
+//   `
+//   row.addEventListener('click', () => {
+//     loadCollection(node.key)
+//   })
+
+//   document.getElementById('collections').appendChild(row)
+// }
+function renderTree(tree, parent, level = 0) {
+  for (const node of tree.children) {
+    const row = document.createElement('a')
+    row.classList.add('row', 'round')
+    row.innerHTML = `
+      <i>inbox</i>
+      <span>${node.name}</span>
+    `
+    row.addEventListener('click', () => {
+      loadCollection(node.key)
+    })
+
+    // Add padding
+    row.style.paddingLeft = `${level * 20}px`
+
+    parent.appendChild(row)
+
+    if (node.children.length > 0) {
+      renderTree(node, parent, level + 1)
+    }
+  }
+}
+
 // Blacklist columns
 const blacklist = ['collectionId', 'collectionName', 'created', 'id', 'expand']
 let collections = {}
@@ -89,23 +154,24 @@ pb.admins
     pb.collections.getFullList().then((data) => {
       console.log(data)
 
-      data.forEach((collection) => {
-        if (collection.type !== 'base') return
-
-        collections[collection.name] = collection
-
-        const row = document.createElement('a')
-        row.classList.add('row', 'round')
-        row.innerHTML = `
-          <i>inbox</i>
-          <span>${collection.name}</span>
-        `
-        row.addEventListener('click', () => {
-          loadCollection(collection.name)
+      data = data
+        .filter((e) => e.type === 'base')
+        .sort((a, b) => {
+          if (a.name < b.name) return -1
+          if (a.name > b.name) return 1
+          return 0
         })
 
-        document.getElementById('collections').appendChild(row)
+      // Create sidebar
+      const tree = buildTree(data)
+
+      console.log(tree)
+
+      data.forEach((collection) => {
+        collections[collection.name] = collection
       })
+
+      renderTree(tree, document.getElementById('collections'))
     })
 
     console.log('Logged in')
@@ -113,6 +179,10 @@ pb.admins
   .catch((err) => {
     console.log(err)
   })
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
 
 function loadCollection(collectionName) {
   document.getElementById('grid').innerHTML = ''
@@ -136,7 +206,7 @@ function loadCollection(collectionName) {
             console.log('Ort')
             return {
               name: val.name,
-              header: val.name,
+              header: capitalizeFirstLetter(val.name),
               renderer: {
                 type: BtnCellRenderer,
                 clicked: async function (field) {
@@ -195,12 +265,12 @@ function loadCollection(collectionName) {
                 name: val.name,
                 sortable: true,
                 type: val.type,
-                header: val.name,
+                header: capitalizeFirstLetter(val.name),
               }
             case 'url':
               return {
                 name: val.name,
-                header: val.name,
+                header: capitalizeFirstLetter(val.name),
 
                 renderer: {
                   type: BtnCellRenderer,
