@@ -125,7 +125,7 @@ function renderTree(tree, parent, level = 0) {
     const row = document.createElement('a')
     row.classList.add('row', 'round')
     row.innerHTML = `
-      <i>inbox</i>
+      <i>data_object</i>
       <span>${node.name}</span>
     `
     row.addEventListener('click', () => {
