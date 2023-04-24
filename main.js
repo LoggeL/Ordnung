@@ -123,15 +123,18 @@ function buildTree(objs) {
 function renderTree(tree, parent, level = 0) {
   for (const node of tree.children) {
     const row = document.createElement('div')
-    row.classList.add('grid')
+    row.classList.add('grid', 's12')
     row.style.padding = '0'
+    row.setAttribute('data-level', level)
 
     const i = document.createElement('i')
     i.innerText = 'arrow_right'
-    i.style.color = 'grey'
-    i.style.cursor = 'not-allowed'
+    i.style.opacity = node.children.length > 0 ? '1' : '0'
+    i.style.color = node.children.length > 0 ? 'black' : 'grey'
+    i.style.cursor = node.children.length > 0 ? 'pointer' : 'default'
     i.style.height = '40px'
     i.classList.add('s1')
+    if (node.children.length > 0) i.onclick = () => row.classList.toggle('open')
     row.appendChild(i)
 
     const button = document.createElement('button')
@@ -151,7 +154,7 @@ function renderTree(tree, parent, level = 0) {
     parent.appendChild(row)
 
     if (node.children.length > 0) {
-      renderTree(node, parent, level + 1)
+      renderTree(node, row, level + 1)
     }
   }
 }

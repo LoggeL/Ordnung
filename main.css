@@ -9,3 +9,36 @@
 .cell-btn:hover .tooltip {
   display: block;
 }
+
+#collections div.grid > div {
+  /* Unselectable */
+  user-select: none;
+
+  /* Hide sibling div */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+
+#collections div.grid.open > div {
+  max-height: 500px;
+  opacity: 1;
+}
+
+#collections div.grid {
+  margin-top: 4px;
+  row-gap: 0;
+}
+
+#collections div.grid > i {
+  /* Unselectable */
+  user-select: none;
+
+  transform: rotate(0deg);
+  transition: transform 0.5s ease;
+}
+
+#collections div.grid.open > i {
+  transform: rotate(90deg);
+}
