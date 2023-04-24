@@ -1,4 +1,4 @@
-const pb = new PocketBase('https://ordnung.logge.top')
+const pb = new PocketBase('https://ordnungdb.logge.top')
 
 // Tui Grid
 const Grid = tui.Grid
