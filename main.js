@@ -122,15 +122,28 @@ function buildTree(objs) {
 // }
 function renderTree(tree, parent, level = 0) {
   for (const node of tree.children) {
-    const row = document.createElement('a')
-    row.classList.add('row', 'round')
-    row.innerHTML = `
-      <i>data_object</i>
-      <span>${node.name}</span>
-    `
-    row.addEventListener('click', () => {
+    const row = document.createElement('div')
+    row.classList.add('grid')
+    row.style.padding = '0'
+
+    const i = document.createElement('i')
+    i.innerText = 'arrow_right'
+    i.style.color = 'grey'
+    i.style.cursor = 'not-allowed'
+    i.style.height = '40px'
+    i.classList.add('s1')
+    row.appendChild(i)
+
+    const button = document.createElement('button')
+    button.innerText = capitalizeFirstLetter(node.name)
+    button.classList.add('s11', 'border')
+    button.style['text-align'] = 'left'
+    if (node.key.split('_').length > level + 1)
+      button.setAttribute('disabled', true)
+    button.addEventListener('click', () => {
       loadCollection(node.key)
     })
+    row.appendChild(button)
 
     // Add padding
     row.style.paddingLeft = `${level * 20}px`
