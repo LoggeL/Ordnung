@@ -55,7 +55,9 @@
                     <i>search</i>
                 </button>
             </div>
+            <div class="small-divider"></div>
         </header>
+        <div id="collections-list"></div>
     </div>
 
     <div class="modal bottom" id="location-modal">
@@ -64,6 +66,34 @@
         <nav class="right-align">
             <button class="border">Close</button>
         </nav>
+    </div>
+
+    <div class="modal large active" id="relation-modal">
+        <div class="row" style="padding:0">
+            <h5>Relation Modal</h5>
+            <div class="row max right-align" style="padding:0">
+                <button class="transparent circle large"
+                    onclick="document.getElementById('relation-modal').classList.remove('active');"><i>close</i>
+                </button>
+            </div>
+        </div>
+        <div class="field label suffix border">
+            <select id="relation-modal-collection-select">
+                <option disabled selected>Please select</option>
+            </select>
+            <label class="active">Collcetion</label>
+            <i>arrow_drop_down</i>
+        </div>
+        <div class="field label prefix border">
+            <i>search</i>
+            <input type="text" id="relation-modal-search">
+            <label>Suchen</label>
+        </div>
+        <div id="relation-modal-item-list" class="no-round">
+            <div class="row center-align">
+                Bitte Kollektion auswählen<i class="large">search</i>
+            </div>
+        </div>
     </div>
 
     <main class="responsive max">

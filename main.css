@@ -42,3 +42,17 @@
 #collections div.grid.open > i {
   transform: rotate(90deg);
 }
+
+#collections-list {
+  max-height: calc(100% - 130px);
+  overflow-y: auto;
+}
+
+#relation-modal-item-list {
+  max-height: calc(100% - 170px);
+  overflow-y: auto;
+}
+
+#relation-modal .field.border {
+  margin: 8px 0;
+}

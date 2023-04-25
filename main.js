@@ -107,19 +107,7 @@ function buildTree(objs) {
 
   return root
 }
-// for (const node of tree.children) {
-//   const row = document.createElement('a')
-//   row.classList.add('row', 'round')
-//   row.innerHTML = `
-//     <i>inbox</i>
-//     <span>${node.name}</span>
-//   `
-//   row.addEventListener('click', () => {
-//     loadCollection(node.key)
-//   })
 
-//   document.getElementById('collections').appendChild(row)
-// }
 function renderTree(tree, parent, level = 0) {
   for (const node of tree.children) {
     const row = document.createElement('div')
@@ -181,13 +169,82 @@ pb.admins
       // Create sidebar
       const tree = buildTree(data)
 
-      console.log(tree)
-
       data.forEach((collection) => {
         collections[collection.name] = collection
       })
 
-      renderTree(tree, document.getElementById('collections'))
+      renderTree(tree, document.getElementById('collections-list'))
+
+      // Populate relation-modal-collection-select
+      const select = document.getElementById('relation-modal-collection-select')
+
+      Object.keys(collections)
+        .sort()
+        .forEach((collection) => {
+          const option = document.createElement('option')
+          option.value = collection
+          option.innerText = collection
+
+          select.appendChild(option)
+        })
+
+      // Add event listener for relation-modal-search
+      document
+        .getElementById('relation-modal-search')
+        .addEventListener('keyup', (e) => {
+          const list = document.getElementById('relation-modal-item-list')
+          const items = list.querySelectorAll('a')
+
+          items.forEach((item) => {
+            if (
+              item.innerText
+                .toLowerCase()
+                .includes(e.target.value.toLowerCase())
+            ) {
+              item.style.display = 'flex'
+            } else {
+              item.style.display = 'none'
+            }
+          })
+        })
+
+      select.addEventListener('change', () => {
+        // Populate relation-modal-item-list
+        const list = document.getElementById('relation-modal-item-list')
+        list.innerHTML = ''
+
+        pb.collection(select.value)
+          .getFullList()
+          .then((data) => {
+            console.log(data)
+
+            data.forEach((item) => {
+              const a = document.createElement('a')
+              a.classList.add('row', 'wave', 'border', 'no-round')
+              a.innerHTML = `
+                <i></i>
+                <div>${item.name}</div>
+              `
+
+              a.addEventListener('click', () => {
+                // Collection from select
+                alert(`${select.value}_${item.id}`)
+                document
+                  .getElementById('relation-modal')
+                  .classList.remove('active')
+
+                document.getElementById(
+                  'relation-modal-collection-select'
+                ).value = ''
+
+                document.getElementById('relation-modal-item-list').innerHTML =
+                  ''
+              })
+
+              list.appendChild(a)
+            })
+          })
+      })
     })
 
     console.log('Logged in')
@@ -212,14 +269,11 @@ function loadCollection(collectionName) {
   pb.collection(collectionName)
     .getFullList()
     .then((data) => {
-      console.log(data)
-
       // Create column definitions
 
       const columnDefs = Object.values(collections[collectionName].schema).map(
         (val) => {
           if (val.name.toLowerCase() == 'ort') {
-            console.log('Ort')
             return {
               name: val.name,
               header: capitalizeFirstLetter(val.name),
@@ -239,8 +293,6 @@ function loadCollection(collectionName) {
                   pb.collection(collection)
                     .getOne(id)
                     .then((data) => {
-                      console.log(data)
-
                       modal.querySelector('h5').innerText =
                         data.name || 'No name'
 
@@ -274,7 +326,6 @@ function loadCollection(collectionName) {
             }
           }
 
-          console.log(val.type)
           switch (val.type) {
             case 'text':
               return {
@@ -282,11 +333,17 @@ function loadCollection(collectionName) {
                 sortable: true,
                 type: val.type,
                 header: capitalizeFirstLetter(val.name),
+                editor: {
+                  type: 'text',
+                },
               }
             case 'url':
               return {
                 name: val.name,
                 header: capitalizeFirstLetter(val.name),
+                editor: {
+                  type: 'text',
+                },
 
                 renderer: {
                   type: BtnCellRenderer,
@@ -301,6 +358,9 @@ function loadCollection(collectionName) {
                 sortable: true,
                 type: val.type,
                 header: val.name,
+                editor: {
+                  type: 'text',
+                },
               }
           }
         }
@@ -320,6 +380,7 @@ function loadCollection(collectionName) {
         el: document.getElementById('grid'),
         columns: columnDefsFiltered,
         data,
+        usageStatistics: false,
       })
     })
     .catch((err) => {
