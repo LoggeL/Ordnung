@@ -408,6 +408,39 @@ function loadCollection(collectionName) {
         columns: columnDefsFiltered,
         data,
         usageStatistics: false,
+        showDummyRows: true,
+        bodyHeight: 'fitToParent',
+      })
+
+      // Add event listener for afterChange
+      instance.on('afterChange', (changes) => {
+        const changedData = changes?.instance?.dataManager?.getAllModifiedData()
+        if (!changedData) return
+
+        console.log(changedData)
+
+        // "updatedRows"
+        for (let i = 0; i < changedData['updatedRows'].length; i++) {
+          const update = changedData['updatedRows'][i]
+
+          pb.collection(update['collectionName'])
+            .update(update['id'], update)
+            .then((data) => {
+              console.log(data)
+              // id="toast-success"
+              document.querySelector(
+                '#toast-success span'
+              ).innerText = `Updated ${data.name}`
+              ui('#toast-success')
+            })
+            .catch((err) => {
+              console.log(err)
+              // id="toast-error"
+              document.querySelector('#toast-error span').innerText =
+                err.message || `Error updating ${data.name}`
+              ui('#toast-error')
+            })
+        }
       })
     })
     .catch((err) => {

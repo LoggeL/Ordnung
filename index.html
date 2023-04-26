@@ -36,6 +36,9 @@
 </head>
 
 <body class="light">
+
+    <!-- Modals -->
+
     <div class="modal left" id="collections">
         <header class="fixed">
             <nav>
@@ -68,7 +71,7 @@
         </nav>
     </div>
 
-    <div class="modal large active" id="relation-modal">
+    <div class="modal large" id="relation-modal">
         <div class="row" style="padding:0">
             <h5>Relation Modal</h5>
             <div class="row max right-align" style="padding:0">
@@ -96,6 +99,20 @@
         </div>
     </div>
 
+    <!-- Toasts -->
+
+    <div class="toast pink white-text" id="toast-error">
+        <i>error</i>
+        <span>Some text here</span>
+    </div>
+
+    <div class="toast green white-text" id="toast-success">
+        <i>done</i>
+        <span>Some text here</span>
+    </div>
+
+    <!-- Grid -->
+
     <main class="responsive max">
         <div class="row">
             <button class="medium border" onclick="document.getElementById('collections').classList.add('active');">
@@ -104,7 +121,9 @@
             <h3 id="name">Ordnung</h3>
         </div>
         <div class="small-space"></div>
-        <div id="grid" class="ag-theme-alpine s12" style="height:calc(100% - 74px);"></div>
+        <div style="height:calc(100% - 74px);">
+            <div id="grid" class="ag-theme-alpine s12"></div>
+        </div>
     </main>
 
     <script type="module" src="beer.min.js"></script>
