@@ -78,6 +78,36 @@ class BtnCellRenderer {
   render(props) {}
 }
 
+// Custom Cell Editor for relation columns
+class RelationCellEditor {
+  constructor(props) {
+    // Open relation-modal
+    const modal = document.getElementById('relation-modal')
+    modal.classList.add('active')
+
+    // Get current collection name
+    const collectionName = document
+      .getElementById('name')
+      .innerText.toLowerCase()
+
+    // set relation-modal-collection-select
+    const select = document.getElementById('relation-modal-collection-select')
+    select.value = collectionName
+  }
+
+  getElement() {
+    return this.el
+  }
+
+  getValue() {
+    return this.el.value
+  }
+
+  mounted() {
+    this.el.select()
+  }
+}
+
 class TreeNode {
   constructor(name, key) {
     this.name = name
@@ -277,6 +307,9 @@ function loadCollection(collectionName) {
             return {
               name: val.name,
               header: capitalizeFirstLetter(val.name),
+              editor: {
+                type: RelationCellEditor,
+              },
               renderer: {
                 type: BtnCellRenderer,
                 clicked: async function (field) {
@@ -333,17 +366,13 @@ function loadCollection(collectionName) {
                 sortable: true,
                 type: val.type,
                 header: capitalizeFirstLetter(val.name),
-                editor: {
-                  type: 'text',
-                },
+                editor: 'text',
               }
             case 'url':
               return {
                 name: val.name,
                 header: capitalizeFirstLetter(val.name),
-                editor: {
-                  type: 'text',
-                },
+                editor: 'text',
 
                 renderer: {
                   type: BtnCellRenderer,
@@ -358,9 +387,7 @@ function loadCollection(collectionName) {
                 sortable: true,
                 type: val.type,
                 header: val.name,
-                editor: {
-                  type: 'text',
-                },
+                editor: 'text',
               }
           }
         }
