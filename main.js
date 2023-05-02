@@ -278,6 +278,9 @@ pb.admins
     })
 
     console.log('Logged in')
+
+    // Init collection
+    loadCollection('technik_pc_monitore')
   })
   .catch((err) => {
     console.log(err)
@@ -410,6 +413,17 @@ function loadCollection(collectionName) {
         usageStatistics: false,
         showDummyRows: true,
         bodyHeight: 'fitToParent',
+        contextMenu: ({ rowKey, columnName }) => [
+          [
+            {
+              name: 'edit',
+              label: 'Edit',
+              action: () => {
+                instance.startEditing(rowKey, columnName)
+              },
+            },
+          ],
+        ],
       })
 
       // Add event listener for afterChange
