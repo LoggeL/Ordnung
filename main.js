@@ -50,14 +50,17 @@ Grid.applyTheme('striped', {
   },
 })
 
+// Tui Grid instance
+let instance
+
 // Custom cell renderer
 class BtnCellRenderer {
   constructor(props) {
     const el = document.createElement('button')
 
     el.classList.add('cell-btn', 'border')
-    el.disabled = props.value === ''
-    el.innerText = props.value === '' ? 'No link' : 'Open'
+    el.disabled = !props.value
+    el.innerText = props.value ? 'Open' : 'No link'
     el.onclick = props.columnInfo.renderer.clicked.bind(this, props.value)
     el.setAttribute('alt', props.value)
 
@@ -178,7 +181,7 @@ function renderTree(tree, parent, level = 0) {
 }
 
 // Blacklist columns
-const blacklist = ['collectionId', 'collectionName', 'created', 'id', 'expand']
+const blacklist = [] // ['collectionId', 'collectionName', 'created', 'expand']
 let collections = {}
 
 pb.admins
@@ -202,6 +205,9 @@ pb.admins
       data.forEach((collection) => {
         collections[collection.name] = collection
       })
+
+      // Init collection
+      loadCollection('technik_pc_monitore')
 
       renderTree(tree, document.getElementById('collections-list'))
 
@@ -278,9 +284,6 @@ pb.admins
     })
 
     console.log('Logged in')
-
-    // Init collection
-    loadCollection('technik_pc_monitore')
   })
   .catch((err) => {
     console.log(err)
@@ -303,98 +306,106 @@ function loadCollection(collectionName) {
     .getFullList()
     .then((data) => {
       // Create column definitions
+      let colDefs = collections[collectionName].schema
 
-      const columnDefs = Object.values(collections[collectionName].schema).map(
-        (val) => {
-          if (val.name.toLowerCase() == 'ort') {
-            return {
-              name: val.name,
-              header: capitalizeFirstLetter(val.name),
-              editor: {
-                type: RelationCellEditor,
-              },
-              renderer: {
-                type: BtnCellRenderer,
-                clicked: async function (field) {
-                  const tags = field.split('_')
+      console.log(colDefs)
 
-                  // last tag is the id
-                  const id = tags.pop()
+      // Add id
+      colDefs.unshift({
+        id: 'id',
+        name: 'id',
+        type: 'text',
+      })
 
-                  // get the collection name from the remaining tags
-                  const collection = tags.join('_')
+      const columnDefs = Object.values(colDefs).map((val) => {
+        console.log(val)
+        if (val.name.toLowerCase() == 'ort') {
+          return {
+            name: val.name,
+            header: capitalizeFirstLetter(val.name),
+            editor: {
+              type: RelationCellEditor,
+            },
+            renderer: {
+              type: BtnCellRenderer,
+              clicked: async function (field) {
+                const tags = field.split('_')
 
-                  const modal = document.getElementById('location-modal')
+                // last tag is the id
+                const id = tags.pop()
 
-                  pb.collection(collection)
-                    .getOne(id)
-                    .then((data) => {
-                      modal.querySelector('h5').innerText =
-                        data.name || 'No name'
+                // get the collection name from the remaining tags
+                const collection = tags.join('_')
 
-                      const table = modal.querySelector('table')
-                      table.innerHTML = ''
+                const modal = document.getElementById('location-modal')
 
-                      for (const key in data) {
-                        if (
-                          key === 'name' ||
-                          blacklist.includes(key) ||
-                          typeof data[key] !== 'string'
-                        )
-                          continue
-                        // Table
-                        table.innerHTML += `
+                pb.collection(collection)
+                  .getOne(id)
+                  .then((data) => {
+                    modal.querySelector('h5').innerText = data.name || 'No name'
+
+                    const table = modal.querySelector('table')
+                    table.innerHTML = ''
+
+                    for (const key in data) {
+                      if (
+                        key === 'name' ||
+                        blacklist.includes(key) ||
+                        typeof data[key] !== 'string'
+                      )
+                        continue
+                      // Table
+                      table.innerHTML += `
                           <tr>
                             <td>${key}</td>
                             <td>${data[key]}</td>
                           </tr>
                         `
-                      }
-                    })
-                    .catch((err) => {
-                      console.log(err)
-                    })
-                    .finally(() => {
-                      ui('#location-modal')
-                    })
+                    }
+                  })
+                  .catch((err) => {
+                    console.log(err)
+                  })
+                  .finally(() => {
+                    ui('#location-modal')
+                  })
+              },
+            },
+          }
+        }
+
+        switch (val.type) {
+          case 'text':
+            return {
+              name: val.name,
+              sortable: true,
+              type: val.type,
+              header: capitalizeFirstLetter(val.name),
+              editor: 'text',
+            }
+          case 'url':
+            return {
+              name: val.name,
+              header: capitalizeFirstLetter(val.name),
+              editor: 'text',
+
+              renderer: {
+                type: BtnCellRenderer,
+                clicked: function (link) {
+                  window.open(link, '_blank')
                 },
               },
             }
-          }
-
-          switch (val.type) {
-            case 'text':
-              return {
-                name: val.name,
-                sortable: true,
-                type: val.type,
-                header: capitalizeFirstLetter(val.name),
-                editor: 'text',
-              }
-            case 'url':
-              return {
-                name: val.name,
-                header: capitalizeFirstLetter(val.name),
-                editor: 'text',
-
-                renderer: {
-                  type: BtnCellRenderer,
-                  clicked: function (link) {
-                    window.open(link, '_blank')
-                  },
-                },
-              }
-            default:
-              return {
-                field: val.name,
-                sortable: true,
-                type: val.type,
-                header: val.name,
-                editor: 'text',
-              }
-          }
+          default:
+            return {
+              field: val.name,
+              sortable: true,
+              type: val.type,
+              header: val.name,
+              editor: 'text',
+            }
         }
-      )
+      })
 
       // Remove blacklisted columns
       const columnDefsFiltered = columnDefs.filter(
@@ -402,9 +413,7 @@ function loadCollection(collectionName) {
       )
 
       // setup the grid after the page has finished loading
-      const gridDiv = document.getElementById('grid')
-
-      const instance = new Grid({
+      instance = new Grid({
         scrollX: true,
         scrollY: true,
         el: document.getElementById('grid'),
@@ -412,7 +421,6 @@ function loadCollection(collectionName) {
         data,
         usageStatistics: false,
         showDummyRows: true,
-        bodyHeight: 'fitToParent',
         contextMenu: ({ rowKey, columnName }) => [
           [
             {
@@ -420,6 +428,13 @@ function loadCollection(collectionName) {
               label: 'Edit',
               action: () => {
                 instance.startEditing(rowKey, columnName)
+              },
+            },
+            {
+              name: 'delete',
+              label: 'Delete',
+              action: () => {
+                instance.removeRow(rowKey)
               },
             },
           ],
@@ -432,6 +447,50 @@ function loadCollection(collectionName) {
         if (!changedData) return
 
         console.log(changedData)
+
+        // "createdRows"
+        for (let i = 0; i < changedData['createdRows'].length; i++) {
+          const create = changedData['createdRows'][i]
+
+          // If the row already has an id, skip
+          if (create['id']) continue
+
+          // Check if all values are empty
+          let empty = true
+
+          for (const key in create) {
+            if (key === 'rowKey') continue
+            if (create[key]) {
+              empty = false
+              break
+            }
+          }
+
+          if (empty) continue
+
+          console.log(create)
+
+          pb.collection(collectionName)
+            .create(create)
+            .then((data) => {
+              // Assing id to the row
+              instance.setValue(create['rowKey'], 'id', data.id)
+
+              console.log(data)
+              // id="toast-success"
+              document.querySelector(
+                '#toast-success span'
+              ).innerText = `Created ${data.name}`
+              ui('#toast-success')
+            })
+            .catch((err) => {
+              console.log(err)
+              // id="toast-error"
+              document.querySelector('#toast-error span').innerText =
+                err.message || `Error creating ${data.name}`
+              ui('#toast-error')
+            })
+        }
 
         // "updatedRows"
         for (let i = 0; i < changedData['updatedRows'].length; i++) {
@@ -455,6 +514,8 @@ function loadCollection(collectionName) {
               ui('#toast-error')
             })
         }
+
+        instance.resetOriginData()
       })
     })
     .catch((err) => {

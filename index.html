@@ -116,12 +116,19 @@
     <main class="responsive max">
         <div class="row">
             <button class="medium border" onclick="document.getElementById('collections').classList.add('active');">
-                <i>menu</i>
+                <i>menu</i> Menu
             </button>
+            <button class="medium border" onclick="instance.appendRow()">
+                <i>add</i> Row
+            </button>
+            <button class="medium border" onclick="instance.export('csv')">
+                <i>download</i> csv
+            </button>
+
             <h3 id="name">Ordnung</h3>
         </div>
         <div class="small-space"></div>
-        <div style="height:calc(100% - 74px);">
+        <div style="max-height:calc(100% - 74px);">
             <div id="grid" class="ag-theme-alpine s12"></div>
         </div>
     </main>
