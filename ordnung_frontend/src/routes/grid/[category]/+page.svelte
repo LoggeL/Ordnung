@@ -72,7 +72,7 @@
   }
 
   div {
-    height: calc(100vh - 52px - 80px);
+    height: calc(100vh - 52px - 44px - 32px);
     width: 100%;
   }
 </style>
