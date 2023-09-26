@@ -1,30 +1,44 @@
 <script>
-	import AgGridSvelte from 'ag-grid-svelte';
-	import 'ag-grid-community/styles/ag-grid.css'; 
-	import 'ag-grid-community/styles/ag-theme-alpine.css'; 
+  // @ts-nocheck
+
+  // Connect to PocketBase Backend
+  import { pbStore } from 'svelte-pocketbase'
+  import { onMount } from 'svelte'
+
+  let tree = []
+
+  onMount(async () => {
+    await $pbStore.admins.authWithPassword('logge@duck.com', '404noswagfound')
+
+    $pbStore.collections.getFullList().then((data) => {
+      tree = data.map((e) => e.name).sort()
+    })
+  })
 </script>
 
 <svelte:head>
-	<title>Grid</title>
-	<meta name="description" content="Svelte demo app" />
+  <title>Ordnung</title>
+  <meta name="description" content="Ordnung DB" />
 </svelte:head>
 
 <section>
-	<div class="ag-theme-alpine" style:width="100%" style:height="100%">
-		<AgGridSvelte  />
-	</div>
+  <ul>
+    {#each tree as category}
+      <li>
+        <a href={`grid/${category}`}>
+          {category}
+        </a>
+      </li>
+    {/each}
+  </ul>
 </section>
 
 <style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
+  section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 0.6;
+  }
 </style>

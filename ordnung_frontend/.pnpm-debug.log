@@ -1,0 +1,305 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "myapp",
+      "version": "0.0.1",
+      "scripts": {
+        "dev": "vite dev",
+        "build": "vite build",
+        "preview": "vite preview",
+        "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
+        "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch"
+      },
+      "devDependencies": {
+        "@fontsource/fira-mono": "^4.5.10",
+        "@neoconfetti/svelte": "^1.0.0",
+        "@sveltejs/adapter-auto": "^2.0.0",
+        "@sveltejs/kit": "^1.20.4",
+        "@types/cookie": "^0.5.1",
+        "svelte": "^4.0.5",
+        "svelte-check": "^3.4.3",
+        "svelte-pocketbase": "^0.0.4",
+        "typescript": "^5.0.0",
+        "vite": "^4.4.2"
+      },
+      "type": "module",
+      "dependencies": {
+        "ag-grid-community": "^30.1.0",
+        "ag-grid-svelte": "^0.3.0"
+      }
+    },
+    "prefix": "/home/logge/ordnung/ordnung_frontend"
+  },
+  "2 warn pnpm": {
+    "message": "Ignoring broken lockfile at /home/logge/ordnung/ordnung_frontend: Lockfile /home/logge/ordnung/ordnung_frontend/pnpm-lock.yaml not compatible with current pnpm",
+    "prefix": "/home/logge/ordnung/ordnung_frontend"
+  },
+  "3 debug pnpm:context": {
+    "currentLockfileExists": false,
+    "storeDir": "/home/logge/.local/share/pnpm/store/v3",
+    "virtualStoreDir": "/home/logge/ordnung/ordnung_frontend/node_modules/.pnpm"
+  },
+  "4 debug pnpm:stage": {
+    "prefix": "/home/logge/ordnung/ordnung_frontend",
+    "stage": "resolution_started"
+  },
+  "5 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/@fontsource%2Ffira-mono"
+  },
+  "6 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/@neoconfetti%2Fsvelte"
+  },
+  "7 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/@sveltejs%2Fadapter-auto"
+  },
+  "8 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/@sveltejs%2Fkit"
+  },
+  "9 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/@types%2Fcookie"
+  },
+  "10 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/svelte"
+  },
+  "11 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/svelte-check"
+  },
+  "12 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/svelte-pocketbase"
+  },
+  "13 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/typescript"
+  },
+  "14 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/vite"
+  },
+  "15 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/ag-grid-community"
+  },
+  "16 debug pnpm:request-retry": {
+    "attempt": 1,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 10000,
+    "url": "https://registry.npmjs.org/ag-grid-svelte"
+  },
+  "17 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/@fontsource%2Ffira-mono"
+  },
+  "18 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/@neoconfetti%2Fsvelte"
+  },
+  "19 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/@sveltejs%2Fadapter-auto"
+  },
+  "20 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/@sveltejs%2Fkit"
+  },
+  "21 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/@types%2Fcookie"
+  },
+  "22 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/svelte"
+  },
+  "23 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/svelte-check"
+  },
+  "24 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/svelte-pocketbase"
+  },
+  "25 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/typescript"
+  },
+  "26 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/vite"
+  },
+  "27 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/ag-grid-community"
+  },
+  "28 debug pnpm:request-retry": {
+    "attempt": 2,
+    "error": {
+      "code": "ERR_INVALID_THIS"
+    },
+    "maxRetries": 2,
+    "method": "GET",
+    "timeout": 60000,
+    "url": "https://registry.npmjs.org/ag-grid-svelte"
+  },
+  "29 error pnpm": {
+    "code": "ERR_PNPM_META_FETCH_FAIL",
+    "attempts": 1,
+    "spec": {
+      "fetchSpec": ">=1.20.4 <2.0.0-0",
+      "name": "@sveltejs/kit",
+      "type": "range"
+    },
+    "pkgsStack": [],
+    "err": {
+      "name": "pnpm",
+      "message": "GET https://registry.npmjs.org/@sveltejs%2Fkit: Value of \"this\" must be of type URLSearchParams",
+      "code": "ERR_PNPM_META_FETCH_FAIL",
+      "stack": "pnpm: GET https://registry.npmjs.org/@sveltejs%2Fkit: Value of \"this\" must be of type URLSearchParams\n    at RetryOperation._fn (/mnt/c/Users/Logge/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.cjs:84467:19)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at runNextTicks (node:internal/process/task_queues:64:3)\n    at listOnTimeout (node:internal/timers:540:9)\n    at process.processTimers (node:internal/timers:514:7)"
+    }
+  }
+}
