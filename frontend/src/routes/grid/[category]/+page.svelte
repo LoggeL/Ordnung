@@ -8,9 +8,11 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
 
-  const category = $page.params.category
-
   const blacklisted = ['collectionId', 'collectionName', 'expand']
+
+  const { category } = $page.params
+
+  console.log('category', category)
 
   /**
    * @type {{ field: string; }[]}
@@ -22,12 +24,14 @@
   let rowData = []
 
   onMount(async () => {
+    $pbStore.autoCancellation(false)
     await $pbStore.admins.authWithPassword('logge@duck.com', '404noswagfound')
 
     $pbStore
       .collection(category)
       .getFullList()
       .then((data) => {
+        console.log(data)
         // Get column names
         columnDefs = Object.keys(data[0])
           .map((e) => {
@@ -57,7 +61,7 @@
 </svelte:head>
 
 <section>
-  <div class="ag-theme-alpine">
+  <div class="ag-theme-alpine-dark">
     <AgGridSvelte {columnDefs} {rowData} />
   </div>
 </section>
@@ -72,7 +76,7 @@
   }
 
   div {
-    height: calc(100vh - 52px - 44px - 32px);
+    height: calc(100vh - 56px - 24px);
     width: 100%;
   }
 </style>
