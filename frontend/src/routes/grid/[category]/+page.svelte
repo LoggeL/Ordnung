@@ -7,12 +7,11 @@
   import { pbStore } from "svelte-pocketbase";
   import { onMount } from "svelte";
   import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
 
-  const blacklisted = ["collectionId", "collectionName", "expand"];
+  const blacklisted = ["collectionId", "collectionName", "expand", "id"];
 
-  const { category } = $page.params;
-
-  console.log("category", category);
+  $: category = $page.params.category;
 
   /**
    * @type {{ field: string; }[]}
@@ -23,6 +22,7 @@
    */
   let rowData = [];
   let loaded = false;
+  let subCategories = [];
 
   function onCellValueChanged(event) {
     console.log(event);
@@ -30,7 +30,13 @@
     return true
   }
 
-  onMount(async () => {
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  async function getGridData() {
+    
+    console.log("getting grid data", category);
     $pbStore.autoCancellation(false);
     await $pbStore.admins.authWithPassword("logge@duck.com", "404noswagfound");
 
@@ -65,7 +71,29 @@
         });
 
         loaded = true;
-      });
+      }).catch(async (e) => {
+        console.error(e)
+        // Category doesn't exist, we show cards instead
+        const categories = await $pbStore.collections.getFullList()
+
+        subCategories = categories.filter((e) => e.name.startsWith(category)).map(e => {
+          const removedName = e.name.replace(category + '_', '')
+          // Get next category
+          const nextCategory = removedName.split('_')[0]
+          return {
+            displayName: capitalizeFirstLetter(nextCategory),
+            link: `/grid/${category}_${nextCategory}`
+          }
+        })
+
+        // only unique display names
+        subCategories = subCategories.filter((e, i) => subCategories.findIndex((f) => f.displayName === e.displayName) === i)
+      })
+  }
+
+  onMount(async () => {
+    console.log("mounted");
+    getGridData();
   });
 </script>
 
@@ -79,7 +107,23 @@
     <div class="ag-theme-alpine-dark">
       <AgGridSvelte {columnDefs} {rowData} {onCellValueChanged} />
     </div>
-  {:else}
+  {:else if subCategories.length > 0}
+    <h1>Subcategories for 
+      {#each category.split('_') as subCategory}
+        <span class="badge variant-filled ml-1">{capitalizeFirstLetter(subCategory)}</span> 
+      {/each}
+    </h1>
+    <nav class="list-nav">
+    <ul>
+      {#each subCategories as subCategory}
+      <li>
+        <a href={subCategory.link} class="card m-4 p-4" on:click={() => {goto(subCategory.link); getGridData()}}>
+          <span class="flex-auto">{capitalizeFirstLetter(subCategory.displayName)}</span>
+      </li>
+        {/each}
+    </ul>
+  </nav>
+    {:else}
     <h1>Loading...</h1>
   {/if}
 </section>
