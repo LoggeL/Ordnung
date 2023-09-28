@@ -1,101 +1,116 @@
 <script>
-  import '../app.postcss'
-  import Fa from 'svelte-fa/src/fa.svelte'
-  import logo from '$lib/images/logo.png'
+  import "../app.postcss";
+  import Fa from "svelte-fa/src/fa.svelte";
+  import logo from "$lib/images/logo.png";
 
-  import { goto } from '$app/navigation'
-  import { page } from '$app/stores'
+  import { goto } from "$app/navigation";
+  import { page } from "$app/stores";
 
-  import { faBars } from '@fortawesome/free-solid-svg-icons'
-  import { AppShell, AppBar, Drawer } from '@skeletonlabs/skeleton'
+  import { faBars } from "@fortawesome/free-solid-svg-icons";
+  import { AppShell, AppBar, Drawer } from "@skeletonlabs/skeleton";
 
-  import { TreeView } from '@skeletonlabs/skeleton'
+  import { TreeView } from "@skeletonlabs/skeleton";
 
-  import { initializeStores } from '@skeletonlabs/skeleton'
+  import { initializeStores } from "@skeletonlabs/skeleton";
 
-  initializeStores()
+  initializeStores();
 
-  import { getDrawerStore } from '@skeletonlabs/skeleton'
+  import { getDrawerStore } from "@skeletonlabs/skeleton";
 
-  const drawerStore = getDrawerStore()
+  const drawerStore = getDrawerStore();
 
   // Pocketbase
-  import { pbStore } from 'svelte-pocketbase'
+  import { pbStore } from "svelte-pocketbase";
   // import { PUBLIC_POCKETBASE_URL } from '$env/static/public'
-  const PUBLIC_POCKETBASE_URL = 'https://ordnungdb.logge.top'
+  const PUBLIC_POCKETBASE_URL = "https://ordnungdb.logge.top";
 
-  pbStore.set(PUBLIC_POCKETBASE_URL)
+  pbStore.set(PUBLIC_POCKETBASE_URL);
 
-  import { onMount } from 'svelte'
+  import { onMount } from "svelte";
 
-  let nodes = { name: 'Ordnung', children: [], open: false }
+  let nodes = { name: "Ordnung", children: [], open: false };
 
-  const year = new Date().getFullYear()
+  const year = new Date().getFullYear();
+
+  let badges = [];
+
+  if ($page.url.pathname.startsWith("/grid")) {
+    badges = $page.url.pathname.replace("/grid/", "").split("_");
+
+    let linkElements = [];
+    badges = badges.map((e) => {
+      linkElements.push(e);
+      return {
+        content: e.charAt(0).toUpperCase() + e.slice(1),
+        link: `/grid/${linkElements.join("_")}`,
+      };
+    });
+  }
 
   onMount(async () => {
-    nodes = await getCollections()
-  })
+    nodes = await getCollections();
+  });
 
   async function getCollections() {
     let treeStructured = {
-      content: 'Ordnung',
+      content: "Ordnung",
       children: [],
       open: false,
-    }
+    };
 
-    $pbStore.autoCancellation(false)
-    await $pbStore.admins.authWithPassword('logge@duck.com', '404noswagfound')
+    $pbStore.autoCancellation(false);
+    await $pbStore.admins.authWithPassword("logge@duck.com", "404noswagfound");
 
     const treeFlat = (await $pbStore.collections.getFullList())
       .map((e) => e.name)
-      .sort()
+      .sort();
 
     // Turn into {content: "content", children: []} format
     treeFlat.forEach((e) => {
-      let current = treeStructured
-      e.split('_').forEach((category) => {
+      let current = treeStructured;
+      e.split("_").forEach((category) => {
         if (current.children.find((g) => g.content === category)) {
-          current = current.children.find((g) => g.content === category)
+          current = current.children.find((g) => g.content === category);
         } else {
           current.children.push({
             content: category,
             children: [],
             value: e,
             open: false,
-          })
-          current = current.children[current.children.length - 1]
+          });
+          current = current.children[current.children.length - 1];
         }
-      })
-    })
+      });
+    });
 
-    return treeStructured
+    return treeStructured;
   }
 
   function resetNodeTree(node) {
-    node.checked = false
-    node.open = false
+    node.checked = false;
+    node.open = false;
     for (let i = 0; i < node.children.length; i++) {
-      resetNodeTree(node.children[i])
+      resetNodeTree(node.children[i]);
     }
   }
 
   function scanForNavigation(node) {
     for (let i = 0; i < node.children.length; i++) {
-      if (!node.children[i].checked) continue
+      if (!node.children[i].checked) continue;
       if (node.children[i].children.length === 0) {
         // Navigate to node.children[i].value
 
-        goto(`/grid/${node.children[i].value}`)
+        goto(`/grid/${node.children[i].value}`);
 
         // Uncheck all nodes
-        resetNodeTree(nodes)
+        resetNodeTree(nodes);
 
         // Close drawer
-        drawerStore.close()
+        drawerStore.close();
 
-        return
+        return;
       } else {
-        scanForNavigation(node.children[i])
+        scanForNavigation(node.children[i]);
       }
     }
   }
@@ -109,7 +124,7 @@
       <svelte:fragment slot="lead">
         <button
           on:click={() => {
-            drawerStore.open()
+            drawerStore.open();
           }}
           class="cursor-pointer prose"
           aria-label="Open Drawer"
@@ -118,13 +133,15 @@
         </button>
         <img src={logo} alt="Logo" class="h-6 float-left mr-1 ml-3" />
         Ordnung
-        {#if $page.url.pathname.startsWith('/grid')}
+        {#if $page.url.pathname.startsWith("/grid")}
           -
           {#each $page.url.pathname
-            .replace('/grid/', '')
-            .split('_')
-            .map((e) => e.charAt(0).toUpperCase() + e.slice(1)) as category}
-            <span class="badge variant-filled ml-1">{category}</span>
+            .replace("/grid/", "")
+            .split("_")
+            .map((e) => e.charAt(0).toUpperCase() + e.slice(1)) as category, i}
+            <a href={`/grid/${$page.url.pathname.split("/grid/")[1].split("_").slice(0, i + 1).join("_")}`} on:click={() => setTimeout(() => window.location.reload())}>
+              <span class="chip variant-filled ml-1">{category}</span>
+            </a>
           {/each}
         {/if}
       </svelte:fragment>
@@ -159,7 +176,7 @@
     bind:nodes={nodes.children}
     on:change={(e) => {
       // Scan for children which are checked but don't have children
-      scanForNavigation(nodes)
+      scanForNavigation(nodes);
     }}
     selection
   />

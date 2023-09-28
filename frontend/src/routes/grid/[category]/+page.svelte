@@ -62,6 +62,9 @@
       .getFullList()
       .then((data) => {
         console.log(data);
+
+        if (!data.length) return loaded = true;
+
         // Get column names
         columnDefs = Object.keys(data[0])
           .map((e) => {
