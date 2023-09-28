@@ -27,7 +27,7 @@
   function onCellValueChanged(event) {
     console.log(event);
 
-    return true
+    return true;
   }
 
   function capitalizeFirstLetter(string) {
@@ -35,10 +35,27 @@
   }
 
   async function getGridData() {
-    
     console.log("getting grid data", category);
     $pbStore.autoCancellation(false);
     await $pbStore.admins.authWithPassword("logge@duck.com", "404noswagfound");
+
+    if (category === "+") {
+      // Get all collections
+      const collections = await $pbStore.collections.getFullList();
+      const topCategories = collections
+        .filter((e) => e.name !== "users")
+        .map((e) => e.name.split("_")[0])
+        .filter((e, i, a) => a.indexOf(e) === i);
+
+      subCategories = topCategories.map((e) => {
+        return {
+          displayName: capitalizeFirstLetter(e),
+          link: `/grid/${e}`,
+        };
+      });
+
+      return;
+    }
 
     $pbStore
       .collection(category)
@@ -71,24 +88,31 @@
         });
 
         loaded = true;
-      }).catch(async (e) => {
-        console.error(e)
+      })
+      .catch(async (e) => {
+        console.error(e);
         // Category doesn't exist, we show cards instead
-        const categories = await $pbStore.collections.getFullList()
+        const categories = await $pbStore.collections.getFullList();
 
-        subCategories = categories.filter((e) => e.name.startsWith(category)).map(e => {
-          const removedName = e.name.replace(category + '_', '')
-          // Get next category
-          const nextCategory = removedName.split('_')[0]
-          return {
-            displayName: capitalizeFirstLetter(nextCategory),
-            link: `/grid/${category}_${nextCategory}`
-          }
-        })
+        subCategories = categories
+          .filter((e) => e.name.startsWith(category))
+          .map((e) => {
+            const removedName = e.name.replace(category + "_", "");
+            // Get next category
+            const nextCategory = removedName.split("_")[0];
+            return {
+              displayName: capitalizeFirstLetter(nextCategory),
+              link: `/grid/${category}_${nextCategory}`,
+            };
+          });
 
         // only unique display names
-        subCategories = subCategories.filter((e, i) => subCategories.findIndex((f) => f.displayName === e.displayName) === i)
-      })
+        subCategories = subCategories.filter(
+          (e, i) =>
+            subCategories.findIndex((f) => f.displayName === e.displayName) ===
+            i
+        );
+      });
   }
 
   onMount(async () => {
@@ -108,22 +132,35 @@
       <AgGridSvelte {columnDefs} {rowData} {onCellValueChanged} />
     </div>
   {:else if subCategories.length > 0}
-    <h1>Subcategories for 
-      {#each category.split('_') as subCategory}
-        <span class="badge variant-filled ml-1">{capitalizeFirstLetter(subCategory)}</span> 
+    <h1>
+      Subcategories for
+      {#each category.split("_") as subCategory}
+        <span class="badge variant-filled ml-1"
+          >{capitalizeFirstLetter(subCategory)}</span
+        >
       {/each}
     </h1>
     <nav class="list-nav">
-    <ul>
-      {#each subCategories as subCategory}
-      <li>
-        <a href={subCategory.link} class="card m-4 p-4" on:click={() => {goto(subCategory.link); getGridData()}}>
-          <span class="flex-auto">{capitalizeFirstLetter(subCategory.displayName)}</span>
-      </li>
+      <ul>
+        {#each subCategories as subCategory}
+          <li>
+            <a
+              href={subCategory.link}
+              class="card m-4 p-4"
+              on:click={() => {
+                goto(subCategory.link);
+                getGridData();
+              }}
+            >
+              <span class="flex-auto"
+                >{capitalizeFirstLetter(subCategory.displayName)}</span
+              >
+            </a>
+          </li>
         {/each}
-    </ul>
-  </nav>
-    {:else}
+      </ul>
+    </nav>
+  {:else}
     <h1>Loading...</h1>
   {/if}
 </section>

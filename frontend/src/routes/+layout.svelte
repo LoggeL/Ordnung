@@ -68,8 +68,6 @@
       })
     })
 
-    console.log('nodes', treeStructured)
-
     return treeStructured
   }
 
