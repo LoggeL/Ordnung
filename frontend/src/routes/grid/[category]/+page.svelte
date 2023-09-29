@@ -24,6 +24,8 @@
   let rowData = [];
   let pinnedTopRowData = [];
 
+  let api;
+
   const defaultColDef = {
     filter: 'agTextColumnFilter',
     sortable: true,
@@ -43,6 +45,44 @@
 
   function onCellValueChanged(event) {
     console.log(event);
+    // If it's rowPinned and name is "Add new", we don't save it
+    if (event.rowPinned && event.data.name === "Add new") return;
+
+    // If it's rowPinned create a new row and save it
+    if (event.rowPinned) {
+
+      console.log("creating new row");
+
+      $pbStore
+        .collection(category)
+        .create(event.data)
+        .then((data) => {
+          console.log(data);
+          event.data.id = data.id;
+          event.data.collectionId = data.collectionId;
+          event.data.collectionName = data.collectionName;
+          event.data.expand = true;
+          pinnedTopRowData = [
+            {
+              name: "Add new",
+              expand: true,
+              collectionId: data.collectionId,
+              collectionName: data.collectionName,
+            },
+          ];
+          rowData.unshift(data);
+          api.setRowData(rowData);
+          console.log(rowData);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+      return;
+    } else {
+      // Normal update
+      console.log("updating row");
+
+    }
 
     return true;
   }
@@ -55,13 +95,14 @@
 
   collections.subscribe((value) => {
 		collectionList = value;
-    console.log(value)
     getGridData()
 	});
 
   async function getGridData() {
+
+    subCategories = [];
+
     console.log("getting grid data", category);
-    console.log(collectionList)
     $pbStore.autoCancellation(false);
     await $pbStore.admins.authWithPassword("logge@duck.com", "404noswagfound");
 
@@ -175,7 +216,7 @@
 <section>
   {#if loaded}
     <div class="ag-theme-alpine-dark">
-      <AgGridSvelte {columnDefs} {rowData} {pinnedTopRowData} {onCellValueChanged} {defaultColDef} />
+      <AgGridSvelte bind:api={api} {columnDefs} {rowData} {pinnedTopRowData} {onCellValueChanged} {defaultColDef} />
     </div>
   {:else if subCategories.length > 0}
     <h1>
