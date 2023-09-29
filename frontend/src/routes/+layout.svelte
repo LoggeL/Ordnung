@@ -17,6 +17,8 @@
 
   import { getDrawerStore } from "@skeletonlabs/skeleton";
 
+  import { collections } from './stores'
+
   const drawerStore = getDrawerStore();
 
   // Pocketbase
@@ -61,7 +63,9 @@
     $pbStore.autoCancellation(false);
     await $pbStore.admins.authWithPassword("logge@duck.com", "404noswagfound");
 
-    const treeFlat = (await $pbStore.collections.getFullList())
+    const collectionList = await $pbStore.collections.getFullList()
+    collections.set(collectionList)
+    const treeFlat = collectionList
       .map((e) => e.name)
       .sort();
 
@@ -139,7 +143,7 @@
             .replace("/grid/", "")
             .split("_")
             .map((e) => e.charAt(0).toUpperCase() + e.slice(1)) as category, i}
-            <a href={`/grid/${$page.url.pathname.split("/grid/")[1].split("_").slice(0, i + 1).join("_")}`} on:click={() => setTimeout(() => window.location.reload())}>
+            <a href={`/grid/${$page.url.pathname.split("/grid/")[1]?.split("_").slice(0, i + 1).join("_")}`} on:click={() => setTimeout(() => window.location.reload())}>
               <span class="chip variant-filled ml-1">{category}</span>
             </a>
           {/each}

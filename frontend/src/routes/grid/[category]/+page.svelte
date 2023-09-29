@@ -5,9 +5,10 @@
 
   // Connect to PocketBase Backend
   import { pbStore } from "svelte-pocketbase";
-  import { onMount } from "svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
+
+  import { collections } from "../../stores";
 
   const blacklisted = ["collectionId", "collectionName", "expand", "id"];
 
@@ -21,6 +22,21 @@
    * @type {{ field: string; }[]}
    */
   let rowData = [];
+  
+  const defaultColDef = {
+    filter: 'agTextColumnFilter',
+    sortable: true,
+    editable: true,
+  };
+
+  const filterMap = {
+    "text": "agTextColumnFilter",
+    "number": "agNumberColumnFilter",
+    "date": "agDateColumnFilter",
+    "select": "agTextColumnFilter",
+    "url": "agTextColumnFilter",
+  }
+
   let loaded = false;
   let subCategories = [];
 
@@ -34,15 +50,24 @@
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
+  let collectionList
+
+  collections.subscribe((value) => {
+		collectionList = value;
+    console.log(value)
+    getGridData()
+	});
+
   async function getGridData() {
     console.log("getting grid data", category);
+    console.log(collectionList)
     $pbStore.autoCancellation(false);
     await $pbStore.admins.authWithPassword("logge@duck.com", "404noswagfound");
 
     if (category === "+") {
       // Get all collections
-      const collections = await $pbStore.collections.getFullList();
-      const topCategories = collections
+
+      const topCategories = collectionList
         .filter((e) => e.name !== "users")
         .map((e) => e.name.split("_")[0])
         .filter((e, i, a) => a.indexOf(e) === i);
@@ -63,18 +88,30 @@
       .then((data) => {
         console.log(data);
 
+        // Get collection schema
+        const thisCollection = collectionList.find((e) => e.name === category);
+        const schema = thisCollection.schema;
+
+        console.log(schema);
+
         if (!data.length) return loaded = true;
 
         // Get column names
         columnDefs = Object.keys(data[0])
           .map((e) => {
             if (blacklisted.includes(e)) return null;
+            const thisSchema = schema.find((f) => f.name === e);
             return {
               field: e,
-              filter: "agTextColumnFilter",
-              sortable: true,
-              editable: true,
-            };
+              filter: ["updated", "created"].includes(e) ? "agDateColumnFilter" : filterMap[thisSchema.type],
+              cellEditor: thisSchema?.type === "select" ? "agSelectCellEditor" : undefined,
+              cellEditorParams: thisSchema?.type === "select" ? {
+                values: thisSchema?.options.values
+              } : undefined,
+              cellRenderer: thisSchema?.type === "url" ? (params) => {
+                return params.value ? `<a class="btn btn-sm variant-filled w-full overflow-hidden" href="${params.value}" target="_blank">${new URL(params.value)?.host || params.value}</a>` : "";
+              } : undefined
+             }
           })
           .filter((e) => e !== null);
 
@@ -118,10 +155,6 @@
       });
   }
 
-  onMount(async () => {
-    console.log("mounted");
-    getGridData();
-  });
 </script>
 
 <svelte:head>
@@ -132,7 +165,7 @@
 <section>
   {#if loaded}
     <div class="ag-theme-alpine-dark">
-      <AgGridSvelte {columnDefs} {rowData} {onCellValueChanged} />
+      <AgGridSvelte {columnDefs} {rowData} {onCellValueChanged} {defaultColDef} />
     </div>
   {:else if subCategories.length > 0}
     <h1>
