@@ -81,7 +81,15 @@
     } else {
       // Normal update
       console.log("updating row");
-
+      $pbStore
+        .collection(category)
+        .update(event.data.id, event.data)
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
     }
 
     return true;
