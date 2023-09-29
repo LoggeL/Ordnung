@@ -22,7 +22,8 @@
    * @type {{ field: string; }[]}
    */
   let rowData = [];
-  
+  let pinnedTopRowData = [];
+
   const defaultColDef = {
     filter: 'agTextColumnFilter',
     sortable: true,
@@ -127,6 +128,15 @@
           return { ...e };
         });
 
+        pinnedTopRowData = [
+          {
+            name: "Add new",
+            expand: true,
+            collectionId: thisCollection.id,
+            collectionName: thisCollection.name,
+          },
+        ];
+
         loaded = true;
       })
       .catch(async (e) => {
@@ -165,7 +175,7 @@
 <section>
   {#if loaded}
     <div class="ag-theme-alpine-dark">
-      <AgGridSvelte {columnDefs} {rowData} {onCellValueChanged} {defaultColDef} />
+      <AgGridSvelte {columnDefs} {rowData} {pinnedTopRowData} {onCellValueChanged} {defaultColDef} />
     </div>
   {:else if subCategories.length > 0}
     <h1>
