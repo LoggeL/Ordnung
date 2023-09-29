@@ -72,6 +72,10 @@
           ];
           rowData.unshift(data);
           api.setRowData(rowData);
+          const rowNode = api.getDisplayedRowAtIndex(0);
+          api.flashCells({
+            rowNodes: [rowNode],
+          });
           console.log(rowData);
         })
         .catch((e) => {
@@ -86,6 +90,10 @@
         .update(event.data.id, event.data)
         .then((data) => {
           console.log(data);
+          api.flashCells({
+            rowNodes: [event.node],
+            columns: [event.column],
+          });
         })
         .catch((e) => {
           console.error(e);
