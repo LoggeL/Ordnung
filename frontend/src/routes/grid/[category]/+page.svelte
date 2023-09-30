@@ -27,18 +27,44 @@
   let api;
 
   const defaultColDef = {
-    filter: 'agTextColumnFilter',
+    filter: "agTextColumnFilter",
     sortable: true,
     editable: true,
   };
 
   const filterMap = {
-    "text": "agTextColumnFilter",
-    "number": "agNumberColumnFilter",
-    "date": "agDateColumnFilter",
-    "select": "agTextColumnFilter",
-    "url": "agTextColumnFilter",
-  }
+    text: "agTextColumnFilter",
+    number: "agNumberColumnFilter",
+    date: "agDateColumnFilter",
+    select: "agTextColumnFilter",
+    url: "agTextColumnFilter",
+    relation: "agTextColumnFilter",
+  };
+
+  const cellRendererMap = (type, params, schema) => {
+    if (!type) return params.value;
+    switch (type) {
+      case "url":
+        return params.value
+          ? `<a class="btn btn-sm variant-filled w-full overflow-hidden" href="${
+              params.value
+            }" target="_blank">${
+              new URL(params.value)?.host || params.value
+            }</a>`
+          : "";
+
+      case "relation":
+        const collection = collectionList.find(
+          (e) => e.id === schema.options.collectionId
+        );
+        return params.value
+          ? `<a class="btn btn-sm variant-filled w-full overflow-hidden" href="/grid/${collection.name}#${params.value}" target="_blank">${collection.name}</a>`
+          : "";
+
+      default:
+        return params.value;
+    }
+  };
 
   let loaded = false;
   let subCategories = [];
@@ -50,7 +76,6 @@
 
     // If it's rowPinned create a new row and save it
     if (event.rowPinned) {
-
       console.log("creating new row");
 
       $pbStore
@@ -103,20 +128,42 @@
     return true;
   }
 
+  function onGridReady() {
+    // Check if we have a hash, then flash the row
+    if (location.hash) {
+      const hash = location.hash.replace("#", "");
+      let rowNode = api.getDisplayedRowAtIndex(
+        rowData.findIndex((e) => e.id === hash)
+      );
+      // Move to top
+      rowData.unshift(rowData.splice(rowData.findIndex((e) => e.id === hash), 1)[0]);
+      api.setRowData(rowData);
+
+      rowNode = api.getDisplayedRowAtIndex(0);
+
+      rowNode.setSelected(true);
+      rowNode.setExpanded(true);
+      api.flashCells({
+        rowNodes: [rowNode],
+      });
+    }
+  }
+
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  let collectionList
+  let collectionList;
 
   collections.subscribe((value) => {
-		collectionList = value;
-    getGridData()
-	});
+    collectionList = value;
+    getGridData();
+  });
 
   async function getGridData() {
-
     subCategories = [];
+
+    if (!category) return
 
     console.log("getting grid data", category);
     $pbStore.autoCancellation(false);
@@ -152,7 +199,7 @@
 
         console.log(schema);
 
-        if (!data.length) return loaded = true;
+        if (!data.length) return (loaded = true);
 
         // Get column names
         columnDefs = Object.keys(data[0])
@@ -161,15 +208,22 @@
             const thisSchema = schema.find((f) => f.name === e);
             return {
               field: e,
-              filter: ["updated", "created"].includes(e) ? "agDateColumnFilter" : filterMap[thisSchema.type],
-              cellEditor: thisSchema?.type === "select" ? "agSelectCellEditor" : undefined,
-              cellEditorParams: thisSchema?.type === "select" ? {
-                values: thisSchema?.options.values
-              } : undefined,
-              cellRenderer: thisSchema?.type === "url" ? (params) => {
-                return params.value ? `<a class="btn btn-sm variant-filled w-full overflow-hidden" href="${params.value}" target="_blank">${new URL(params.value)?.host || params.value}</a>` : "";
-              } : undefined
-             }
+              filter: ["updated", "created"].includes(e)
+                ? "agDateColumnFilter"
+                : filterMap[thisSchema.type],
+              cellEditor:
+                thisSchema?.type === "select"
+                  ? "agSelectCellEditor"
+                  : undefined,
+              cellEditorParams:
+                thisSchema?.type === "select"
+                  ? {
+                      values: thisSchema?.options.values,
+                    }
+                  : undefined,
+              cellRenderer: (params) =>
+                cellRendererMap(thisSchema?.type, params, thisSchema),
+            };
           })
           .filter((e) => e !== null);
 
@@ -221,7 +275,6 @@
         );
       });
   }
-
 </script>
 
 <svelte:head>
@@ -232,7 +285,15 @@
 <section>
   {#if loaded}
     <div class="ag-theme-alpine-dark">
-      <AgGridSvelte bind:api={api} {columnDefs} {rowData} {pinnedTopRowData} {onCellValueChanged} {defaultColDef} />
+      <AgGridSvelte
+        bind:api
+        {columnDefs}
+        {rowData}
+        {pinnedTopRowData}
+        {onCellValueChanged}
+        {onGridReady}
+        {defaultColDef}
+      />
     </div>
   {:else if subCategories.length > 0}
     <h1>
